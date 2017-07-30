@@ -1,0 +1,20 @@
+﻿namespace Scannn.Models
+{
+    public class Product
+    {
+        public string bat_description_private { get; set; }
+        public string ite_status { get; set; }
+        public string bat_mandate { get; set; }
+        public string pro_detail { get; set; }
+        public string bat_warning { get; set; }
+        public string bat_detail { get; set; }
+        public string bat_expdate { get; set; }
+        public string bat_name { get; set; }
+        
+        public string ite_soldtime { get; set; }
+        public string bat_manual { get; set; }
+        public string bat_promotion { get; set; }
+        public string pro_name { get; set; } 
+
+    }
+}

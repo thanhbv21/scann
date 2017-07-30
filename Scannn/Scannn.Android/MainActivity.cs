@@ -6,7 +6,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
-using ZXing.Net.Mobile.Forms;
+using ZXing.Mobile;
 
 namespace Scannn.Droid
 {
@@ -21,7 +21,9 @@ namespace Scannn.Droid
             base.OnCreate(bundle);
 
             global::Xamarin.Forms.Forms.Init(this, bundle);
-            ZXing.Net.Mobile.Forms.Android.Platform.Init();
+            global::ZXing.Net.Mobile.Forms.Android.Platform.Init();
+            
+            MobileBarcodeScanner.Initialize(Application);
             LoadApplication(new App());
         }
 

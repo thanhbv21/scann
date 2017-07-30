@@ -16,6 +16,8 @@
                      Spacing="15">
             <Label Text="Press to Scan:" />
             <Button x:Name="BtnScan" Text="Scan" />
+            <Button x:Name="takePhotoButton" Text="Take Photos" HorizontalOptions="Center" VerticalOptions="CenterAndExpand" Clicked="OnTakePhotoButtonClicked" />
+
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

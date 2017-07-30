@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Scannn.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,11 +13,15 @@ namespace Scannn
 {
     public partial class App : Application
     {
+        public static ServicesManager SvManager { get; private set; }
+        //public static ResultManager NavigationResult { get; private set; }
         public App()
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            SvManager = new ServicesManager(new GetProduct());
+            //MainPage = new NavigationPage(new Scannn.MainPage());
+            MainPage = new NavigationPage(new Scannn.HomePage());
         }
 
         protected override void OnStart()

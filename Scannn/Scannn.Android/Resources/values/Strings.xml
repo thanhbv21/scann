@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="Hello">Hello World, Click Me!</string>
+    <string name="ApplicationName">Scannercheck</string>
+    <string name="title">Hello World, Click Me!</string>
+    <string name="description">
+      Most developers are already familiar with the use of dpi suffixes on the drawable directory to provide multiple versions of an image, letting Android choose the correct version for each device. The same mechanism is used to provide multiple language translations by suffixing resource directories with language and culture identifiers.
+      Note: when specifying a top-level language like es only two characters are required; however when specifying a full locale, the directory name format requires a dash and lowercase r to separate the two parts, for example pt-rBR or zh-rCN. Compare this to the value returned in code, which has an underscore (eg. pt_BR). Both of these are different to the value .NET CultureInfo class uses, which has a dash only (eg. pt-BR). Keep these differences in mind when working across Xamarin platforms.
+    </string>
+</resources>
