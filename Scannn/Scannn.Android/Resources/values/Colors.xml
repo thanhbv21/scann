@@ -4,6 +4,7 @@
 
   <color name="theme_green">#269435</color>
   <color name="theme_blue">#3b9fe5</color>
+  <color name="theme_fb">#3b5999</color>
   <color name="white">#FFFFFF</color>
   <color name="yellow">#FFFF00</color>
   <color name="fuchsia">#FF00FF</color>
@@ -21,6 +22,6 @@
   <color name="navy">#000080</color>
   <color name="black">#000000</color>
   <color name="dark_grey">#303030</color>
-
-
+  <color name="white_grey">#cccccc</color>
+  <color name="prima_purple">#5e2abb</color>
 </resources>

@@ -1,68 +1,95 @@
-﻿using System;
+﻿using Android.Views;
 using Android.Widget;
-using Scannn.Droid;
+using cdit.ezcheck;
+using Scannn;
+using Scannn.Views;
+using System;
 using Xamarin.Forms;
 using ZXing.Mobile;
-using Scannn.Models;
-using Scannn.Views;
 
 [assembly: Dependency(typeof(PhoneScanner))]
-namespace Scannn.Droid
+namespace cdit.ezcheck
 {
-    public class PhoneScanner : ActiveScan
+    public class PhoneScanner : IActiveScan
     {
-
+        Android.Views.View zxingOverlay;
+        Android.Widget.Button flashButton;
         MobileBarcodeScanner scanner = new MobileBarcodeScanner();
         public async void Scan()
         {
-            scanner.UseCustomOverlay = false;
-            //var options = new MobileBarcodeScanningOptions() { };
+            scanner.UseCustomOverlay = true;
+            var options = new MobileBarcodeScanningOptions() {
+                 AutoRotate = false
+            };
+            zxingOverlay = LayoutInflater.FromContext(Android.App.Application.Context).Inflate(Resource.Layout.ScanCustom, null);
+            //zxingOverlay.scree
+ 
+            flashButton = zxingOverlay.FindViewById<Android.Widget.Button>(Resource.Id.buttonFlash);
+            flashButton.Click += (sender, e) =>
+            {
+                if (flashButton.Text == "Tắt Flash") flashButton.Text = "Bật Flash";
+                else flashButton.Text = "Tắt Flash";
+                scanner.ToggleTorch();
+            };
+            scanner.CustomOverlay = zxingOverlay;
 
-            scanner.TopText = "Giữ camera cách mã khoảng 6inch";
-            scanner.BottomText = "Đợi một chút...";
+            //scanner.TopText = "Giữ camera cách mã khoảng 6inch";
+            //scanner.BottomText = "Đợi một chút...";
 
-            var result = await scanner.Scan();
-        
+            var result = await scanner.Scan(options);
+            System.Diagnostics.Debug.WriteLine("Đợi két quả");
             HandleScanResult(result);
         }
 
         public void HandleScanResult(ZXing.Result result)
         {
             string msg = "";
-
+            System.Diagnostics.Debug.WriteLine("Đợi Ktra kết quả");
             if (result != null && !string.IsNullOrEmpty(result.Text))
             {
                 string message = result.Text;
-                //if (message.Contains("ezcheck") == true)
-                //{
-                    string[] splitlink;
-                    splitlink = message.Split(new string[] { "/" }, StringSplitOptions.None);
-                    string itemcode = splitlink[splitlink.Length - 1];
-                    msg = "Found a link: " + itemcode;
-                    var newResultPage = new ResultPage();
-                    newResultPage.setlayout(itemcode);
-                    Application.Current.MainPage.Navigation.PushAsync(newResultPage);
-                /*Product pro = await App.SvManager.GetProductAsync(itemcode);
-                Company com = await App.SvManager.GetCompanyAsync(itemcode);
-                ImageAPI image = await App.SvManager.GetImageAsync(itemcode);
+                System.Diagnostics.Debug.WriteLine("bắt đầu ktra");
+                bool checkresult = Uri.TryCreate(message, UriKind.Absolute, out Uri uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                if (checkresult)
+                {
+                    System.Diagnostics.Debug.WriteLine("đây là URL");
+                    if (message.Contains("ezcheck") == true)
+                    {
+                        string[] splitlink;
+                        splitlink = message.Split(new string[] { "/" }, StringSplitOptions.None);
+                        System.Diagnostics.Debug.WriteLine("đây là url ezcheck");
+                        string itemcode = splitlink[splitlink.Length - 1];
+                        bool isNumberic = long.TryParse(itemcode, out long itemcodenum);
+                        if (isNumberic)
+                        {
+                            msg = "Tìm thấy mã sản phẩm: " + itemcode;
+                            System.Diagnostics.Debug.WriteLine("bắt đầu đẩy");
+                            var newResultPage = new ResultPage(itemcode);
+                            Application.Current.MainPage.Navigation.PushAsync(newResultPage);
+                        }
+                        else
+                        {
+                            msg = "Tìm thấy URL: " + message;
+                            if (itemcode[0].ToString().Equals("B")) Application.Current.MainPage.Navigation.PushAsync(new ResultPage(itemcode));
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("đây URL ezcheck thuần");
+                                Device.OpenUri(new Uri(message));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        msg = "Tìm thấy URL: " + message;
+                    }
 
-                LayoutDataResult dataresult = new LayoutDataResult();
-                dataresult.product = pro;
-                dataresult.company = com;
-                dataresult.image = image.image;
-
-                var newResultPage = new ResultPage();
-                newResultPage.setlayout(dataresult);
-                await Application.Current.MainPage.Navigation.PushAsync(newResultPage);*/
-                //}
-
-                //else msg = "Tìm thấy nội dung: " + result.Text;
+                }
+                else msg = "Tìm thấy nội dung: " + message;
             }
-               
+
             else
                 msg = "Scanning Canceled!";
-            //Toast.MakeText(Android.App.Application.Context, msg, ToastLength.Long).Show();
-            //return msg;
+            Toast.MakeText(Android.App.Application.Context, msg, ToastLength.Long).Show();
         }
     }
 }

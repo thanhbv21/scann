@@ -2,10 +2,10 @@
 {
     public class Company
     {
-        public string com_email { get; set; }
-        public string com_website { get; set; }
-        public string com_mobile { get; set; }
-        public string com_name { get; set; }
-        public string com_addr { get; set; }
+        public string email { get; set; }
+        public string website { get; set; }
+        public string mobile { get; set; }
+        public string name { get; set; }
+        public string addr { get; set; }
     }
 }

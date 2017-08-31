@@ -1,6 +1,6 @@
 ﻿namespace Scannn.Models
 {
-    class ProductAPI
+    public class ProductAPI
     {
         public int code { get; set; }
         public string description { get; set; }

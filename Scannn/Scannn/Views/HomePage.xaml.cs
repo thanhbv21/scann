@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Scannn
@@ -15,8 +9,9 @@ namespace Scannn
         public HomePage()
         {
             // A custom renderer is used to display the home UI
+            NavigationPage.SetHasNavigationBar(this, false);
             InitializeComponent();
-
+            
         }
     }
 }

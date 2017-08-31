@@ -16,13 +16,10 @@ namespace Scannn
             var buttonScan = this.FindByName<Button>("BtnScan");
             buttonScan.Clicked += (sender, e) =>
             {
-                DependencyService.Get<ActiveScan>().Scan();
+                DependencyService.Get<IActiveScan>().Scan();
             };
             
         }
-        async void OnTakePhotoButtonClicked(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new ResultPage());
-        }
+        
     }
 }

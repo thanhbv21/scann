@@ -1,26 +1,33 @@
-﻿using System;
-using System.IO;
-using Xamarin.Forms;
-using Xamarin.Forms.Platform.Android;
+﻿using Android.OS;
+using Android.Support.V7.App;
+using Android.Views;
+using cdit.ezcheck;
 using Scannn;
 using Scannn.Droid;
-using Android.App;
-using Android.Hardware;
-using Android.Views;
-using Android.Graphics;
-using Android.Widget;
+using Scannn.Views;
+using System;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
+using static Android.Support.V4.View.ViewPager;
 
-[assembly:ExportRenderer (typeof(HomePage), typeof(HomePageRenderer))]
-namespace Scannn.Droid
+[assembly: ExportRenderer(typeof(HomePage), typeof(HomePageRenderer))]
+namespace cdit.ezcheck
 {
     public class HomePageRenderer : PageRenderer
     {
-        //global::Android.Hardware.Camera camera;
-        global::Android.Widget.Button ScanButton;
         global::Android.Views.View view;
+        global::Android.Support.V4.View.ViewPager pager;
+        global::Android.Support.Design.Widget.TabLayout tabLayout;
+        global::Android.Support.V7.Widget.SearchView search;
+        MainPagerAdapter adapter;
 
-        Activity activity;
+        AppCompatActivity activity;
 
+        private int[] tabIcons = {
+            Resource.Drawable.home_color_selector,
+            Resource.Drawable.history_color_selector,
+            Resource.Drawable.dashboard_color_selector
+        };
         protected override void OnElementChanged(ElementChangedEventArgs<Page> e)
         {
             base.OnElementChanged(e);
@@ -29,11 +36,9 @@ namespace Scannn.Droid
             {
                 return;
             }
-
             try
             {
-                activity = this.Context as Activity;
-                view = activity.LayoutInflater.Inflate(Resource.Layout.HomeAndroid, this, false);
+                SetupUserInterface();
                 SetupEventHandlers();
                 AddView(view);
             }
@@ -45,17 +50,62 @@ namespace Scannn.Droid
 
         void SetupUserInterface()
         {
-            
+            activity = this.Context as AppCompatActivity;
+            view = activity.LayoutInflater.Inflate(Resource.Layout.Main, this, false);
         }
-
         void SetupEventHandlers()
         {
-            ScanButton = view.FindViewById<global::Android.Widget.Button>(Resource.Id.ScanButton);
+            pager = view.FindViewById<global::Android.Support.V4.View.ViewPager>(Resource.Id.pager);
+            tabLayout = view.FindViewById<global::Android.Support.Design.Widget.TabLayout>(Resource.Id.sliding_tabs);
+            adapter = new MainPagerAdapter(view.Context, activity.SupportFragmentManager);
+            
+            pager.Adapter = adapter;
+            /*pager.PageSelected += (object sender, PageSelectedEventArgs e) =>
+                {
+                    if( e.Position==1)
+                    {
+                        Handler h = new Handler();
+                        Action myAction = () =>
+                        {
+                            // your code that you want to delay here
+                            pager.Adapter.NotifyDataSetChanged();
+                            for (int i = 0; i < tabLayout.TabCount; i++)
+                            {
+                                Android.Support.Design.Widget.TabLayout.Tab tab = tabLayout.GetTabAt(i);
+                                tab.SetIcon(tabIcons[i]);
+                            }
+                        };
+                        h.PostDelayed(myAction, 500);
+                    }
+                };*/
+            tabLayout.SetupWithViewPager(pager);
+
+            for (int i = 0; i < tabLayout.TabCount; i++)
+            {
+                Android.Support.Design.Widget.TabLayout.Tab tab = tabLayout.GetTabAt(i);
+                tab.SetIcon(tabIcons[i]);
+            }
+
+            Android.Widget.Button ScanButton = view.FindViewById<global::Android.Widget.Button>(Resource.Id.ScanButton);
             ScanButton.Click += (sender, e) =>
             {
-                DependencyService.Get<ActiveScan>().Scan();
+                DependencyService.Get<IActiveScan>().Scan();
+            };
+
+            search = view.FindViewById<Android.Support.V7.Widget.SearchView>(Resource.Id.searchview);
+            search.QueryHint = "Truy vấn mã sản phẩm";
+            search.InputType = 2;
+            search.SetIconifiedByDefault(false);
+            search.QueryTextSubmit += (sender, e) =>
+            {
+                //Android.Widget.Toast.MakeText(view.Context, "You searched: " + e.Query, Android.Widget.ToastLength.Short).Show();
+                search.SetQuery("", false);
+                search.ClearFocus();
+                var newResultPage = new ResultPage(e.Query);
+                App.Current.MainPage.Navigation.PushAsync(newResultPage);
             };
         }
+
         protected override void OnLayout(bool changed, int l, int t, int r, int b)
         {
             base.OnLayout(changed, l, t, r, b);
@@ -66,5 +116,6 @@ namespace Scannn.Droid
             view.Measure(msw, msh);
             view.Layout(0, 0, r - l, b - t);
         }
+
     }
 }

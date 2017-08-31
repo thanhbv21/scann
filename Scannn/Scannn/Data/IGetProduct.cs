@@ -5,12 +5,13 @@ namespace Scannn
 {
     public interface IGetProduct
     {
-        Task<Product> PerformGetProductAsync(string itemcode);
+        Task<ProductAPI> PerformGetProductAsync(string itemcode);
 
-        Task<Company> PerformGetCompanyAsync(string itemcode);
+        Task<CompanyAPI> PerformGetCompanyAsync(string itemcode);
 
         Task<ImageAPI> PerformGetImageAsync(string itemcode);
 
+        Task PerformPurchaseProductAsync(string itemcode, bool isPurchase);
         //Task SaveTodoItemAsync(TodoItem item, bool isNewItem);
 
         //Task DeleteTodoItemAsync(string id);

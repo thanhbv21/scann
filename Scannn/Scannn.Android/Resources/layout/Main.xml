@@ -1,0 +1,59 @@
+﻿<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+  <android.support.design.widget.AppBarLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+      <android.support.v7.widget.Toolbar
+          android:id="@+id/toolbar"
+          android:orientation="horizontal"
+          android:layout_width="match_parent"
+          android:layout_height="?attr/actionBarSize"
+          android:background="?attr/colorPrimary"
+          android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+          app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+          <android.support.v7.widget.SearchView
+              android:id="@+id/searchview"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:hint ="Truy vấn theo mã sản phẩm"/>
+      </android.support.v7.widget.Toolbar>
+   
+  </android.support.design.widget.AppBarLayout>
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_marginTop="?attr/actionBarSize">
+    <Button
+        android:id="@+id/ScanButton"
+        android:clickable="true"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/ic_scan_button"
+        android:layout_marginTop="150dp" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        
+        android:layout_marginBottom="48dp"
+        android:layout_above="@+id/tabs"/>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/sliding_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@android:color/white"
+        app:tabBackground ="@drawable/tab_color_selector"
+        android:layout_alignParentBottom="true"/>
+  </RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

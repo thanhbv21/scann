@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Scannn.Models;
 using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Scannn.Data
@@ -14,11 +16,40 @@ namespace Scannn.Data
         Company company = new Company();
         public GetProduct ()
         {
-            client = new HttpClient();
-            client.MaxResponseContentBufferSize = 256000;
+            client = new HttpClient()
+            {
+                MaxResponseContentBufferSize = 256000
+            };
         }
 
-        public async Task<Company> PerformGetCompanyAsync(string itemcode)
+        public async Task PerformPurchaseProductAsync(string itemcode, bool isPurchase)
+        {
+            Debug.WriteLine("Activate Purchase");
+            var uri = new Uri(string.Format(Constants.RestPurchaseUrl, string.Empty));
+            try
+            {
+                var json = new JObject(new JProperty("code", itemcode));
+                var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = null;
+
+                if (isPurchase)
+                {
+                    Debug.WriteLine("link:" + uri);
+                    response = await client.PostAsync(uri, content);
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    Debug.WriteLine(@"             Location successfully saved. Status code: " + response.StatusCode + "\n" + response.RequestMessage);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(@"				ERROR {0}", ex.Message);
+            }
+        }
+        public async Task<CompanyAPI> PerformGetCompanyAsync(string itemcode)
         {
 
             Debug.WriteLine("Activate get Company");
@@ -34,7 +65,7 @@ namespace Scannn.Data
                     var content = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine(content);
                     Items = JsonConvert.DeserializeObject<CompanyAPI>(content);
-                    return Items.company;
+                    return Items;
                 }
             }
             catch (Exception ex)
@@ -56,10 +87,17 @@ namespace Scannn.Data
                 var response = await client.GetAsync(uri);
                 if (response.IsSuccessStatusCode)
                 {
+                    
                     var content = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine(content);
                     Items = JsonConvert.DeserializeObject<ImageAPI>(content);
+                    if(Items.code == 200)
                     return Items;
+                    else
+                    {
+                        Items.image = "";
+                        return Items;
+                    }
                 }
             }
             catch (Exception ex)
@@ -69,11 +107,10 @@ namespace Scannn.Data
             throw new NotImplementedException();
         }   
 
-        public async Task<Product> PerformGetProductAsync(string itemcode)
+        public async Task<ProductAPI> PerformGetProductAsync(string itemcode)
         {
             Debug.WriteLine("Activate get Product");
             ProductAPI Items = new ProductAPI();
-            Product pro = new Product();
             Debug.WriteLine("mã hàng:" + itemcode);
             var uri = new Uri(string.Format(Constants.RestProductUrl, itemcode));
             try
@@ -85,8 +122,7 @@ namespace Scannn.Data
                     var content = await response.Content.ReadAsStringAsync();
                     Debug.WriteLine(content);
                     Items = JsonConvert.DeserializeObject<ProductAPI>(content);
-                    pro = Items.item;
-                    Debug.WriteLine("Sản phẩm lấy được: " + pro.pro_name);
+                    Debug.WriteLine("Sản phẩm lấy được: " + Items.item.pro_name);
                 }
             }
             catch (Exception ex)
@@ -94,7 +130,7 @@ namespace Scannn.Data
                 Debug.WriteLine(@"				ERROR {0}", ex.Message);
             }
            // throw new NotImplementedException();
-            return pro;
+            return Items;
         }
     }
 }

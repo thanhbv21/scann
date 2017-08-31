@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Scannn.Models
 {
-    class CompanyAPI
+    public class CompanyAPI
     {
         public int code { get; set; }
         public string description { get; set; }

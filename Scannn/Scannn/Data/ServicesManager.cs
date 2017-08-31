@@ -6,10 +6,37 @@ namespace Scannn.Data
     public class ServicesManager
     {
         IGetProduct getproduct;
+        IGetNews getnews;
+        IGetLocation getlocation;
 
         public ServicesManager (IGetProduct service)
         {
             getproduct = service;
+        }
+
+        public ServicesManager(IGetLocation service)
+        {
+            getlocation = service;
+
+        }
+        public ServicesManager(IGetNews service)
+        {
+            getnews = service;
+        }
+
+        public Task<NewItemsAPI> GetNewsAsync()
+        {
+            return getnews.PerformGetNewsAsync();
+        }
+
+        public Task<LocationAPI> GetLocationAsync()
+        {
+            return getlocation.PerformGetLocationAsync();
+        }
+
+        public Task UpdateLocationAsync(LocationAPI location, bool isNewLocation, string itemcode)
+        {
+            return getlocation.PerformUpdateLocationAsync(location, isNewLocation, itemcode);
         }
 
         public Task<ImageAPI> GetImageAsync(string itemcode)
@@ -17,12 +44,17 @@ namespace Scannn.Data
             return getproduct.PerformGetImageAsync(itemcode);
         }
 
-        public Task<Product> GetProductAsync(string itemcode)
+        public Task<ProductAPI> GetProductAsync(string itemcode)
         {
             return getproduct.PerformGetProductAsync(itemcode);
         }
 
-        public Task<Company> GetCompanyAsync(string itemcode)
+        public Task PurchaseProductAsync(string itemcode, bool isPurchase)
+        {
+            return getproduct.PerformPurchaseProductAsync(itemcode, isPurchase);
+        }
+
+        public Task<CompanyAPI> GetCompanyAsync(string itemcode)
         {
             return getproduct.PerformGetCompanyAsync(itemcode);
         }
