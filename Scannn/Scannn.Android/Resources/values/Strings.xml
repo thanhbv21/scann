@@ -5,4 +5,8 @@
     <string name="titleText1">Mã SP</string>
     <string name="titleText2">Nhà SX</string>
     <string name="titleText3">Thời gian</string>
+    <string name="app_id">
+      256853461500150
+    </string>
+  <string name="app_name">ezCheck</string>
 </resources>

@@ -89,6 +89,7 @@ namespace cdit.ezcheck
             Android.Widget.Button ScanButton = view.FindViewById<global::Android.Widget.Button>(Resource.Id.ScanButton);
             ScanButton.Click += (sender, e) =>
             {
+                //DependencyService.Get<IActiveScan>().Scan();
                 DependencyService.Get<IActiveScan>().Scan();
             };
 

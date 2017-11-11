@@ -8,6 +8,7 @@ namespace Scannn
 {
     public interface IActiveScan
     {
+        //void Scan();
         void Scan();
     }
 }

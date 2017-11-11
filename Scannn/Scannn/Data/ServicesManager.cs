@@ -8,6 +8,7 @@ namespace Scannn.Data
         IGetProduct getproduct;
         IGetNews getnews;
         IGetLocation getlocation;
+        IGetUserProfile getuserprofile;
 
         public ServicesManager (IGetProduct service)
         {
@@ -22,6 +23,11 @@ namespace Scannn.Data
         public ServicesManager(IGetNews service)
         {
             getnews = service;
+        }
+
+        public ServicesManager(IGetUserProfile service)
+        {
+            getuserprofile = service;
         }
 
         public Task<NewItemsAPI> GetNewsAsync()
@@ -58,5 +64,24 @@ namespace Scannn.Data
         {
             return getproduct.PerformGetCompanyAsync(itemcode);
         }
+
+        public Task<LHYDAPI> GetLHYDAsync(string itemcode)
+        {
+            return getproduct.PerformGetLHYDAPI(itemcode);
+        }
+
+        public Task<LoginAPI> DoLoginAsync(string email, string password)
+        {
+            
+            return getuserprofile.PerformLoginAsync(email, password);
+        }
+        public Task DoLogoutAsync(string sessionid)
+        {
+            return getuserprofile.PerformLogoutAsync(sessionid);
+        }
+        public Task<string> GetFullNameWitoutSSAsync(string email)
+        {
+            return getuserprofile.PerformGetFullNameAsync(email);
+                }
     }
 }

@@ -33,7 +33,7 @@ namespace Scannn.Views
                     new Label
                     {
                         Margin = new Thickness(0, 10 , 0, 0),
-                        Text = "Phiên bản:\t\t\t\t3.0.1",
+                        Text = "Phiên bản:\t\t\t\t3.0.2",
                         TextColor = Color.Black
                     },
                     new Label

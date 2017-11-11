@@ -25,10 +25,23 @@ namespace Scannn.iOS
 
             if (cell == null) cell = new HistoryItemCell(CellIdentifier);
             //{ cell = new UITableViewCell(UITableViewCellStyle.Default, CellIdentifier); }
-
-            byte[] imageByte = Convert.FromBase64String(item.itemimage);
-            NSData data = NSData.FromArray(imageByte);
-            UIImage itemimage = UIImage.LoadFromData(data);
+            UIImage itemimage;
+            try
+            {
+                if(item.itemimage == "")
+                {
+                    itemimage = UIImage.FromFile("icon_default");
+                } else
+                {
+                    byte[] imageByte = Convert.FromBase64String(item.itemimage);
+                    NSData data = NSData.FromArray(imageByte);
+                    itemimage = UIImage.LoadFromData(data);
+                }
+            }
+            catch
+            {
+                itemimage = UIImage.FromFile("icon_default");
+            }
             cell.UpdateCell(item.itemname, item.itemcode, itemimage, item.datetime, item.companyname);
 
             return cell;

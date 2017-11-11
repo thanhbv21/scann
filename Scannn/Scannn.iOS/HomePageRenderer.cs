@@ -1,7 +1,10 @@
 ﻿using CoreGraphics;
+using Foundation;
 using Scannn;
 using Scannn.iOS;
+using Scannn.Views;
 using System;
+using System.Drawing;
 using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
@@ -65,12 +68,30 @@ namespace Scannn.iOS
             offset.Vertical = 10;
 
             search.SearchFieldBackgroundPositionAdjustment = offset;
-            search.BarTintColor = UIColor.White;
+            search.KeyboardType = UIKeyboardType.NumberPad;
             search.BackgroundColor = Color.FromHex(Constants.ColorPrimary).ToUIColor();
             search.SearchBarStyle = UISearchBarStyle.Minimal;
             search.Placeholder = "Truy vấn mã sản phẩm";
             search.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
-            search.BarTintColor = Color.FromHex(Constants.ColorSecondary).ToUIColor();
+            search.BarTintColor = UIColor.White;//Color.FromHex(Constants.ColorSecondary).ToUIColor();
+            //search.color
+
+            UIToolbar toolbar = new UIToolbar(new RectangleF(0.0f, 0.0f, 50.0f, 44.0f));
+            var doneButton = new UIBarButtonItem(UIBarButtonSystemItem.Done, delegate
+            {
+                search.ResignFirstResponder();
+                if(search.Text.Length != 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("text: " + search.Text);
+                    var newResultPage = new ResultPage(search.Text);
+                    Xamarin.Forms.Application.Current.MainPage.Navigation.PushAsync(newResultPage);
+                }
+            });
+            toolbar.Items = new UIBarButtonItem[] {
+            new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace),
+            doneButton
+            };
+            search.InputAccessoryView = toolbar;
 
             ScanButton = new UIButton();
             ScanButton = UIButton.FromType(UIButtonType.Custom);
@@ -83,9 +104,33 @@ namespace Scannn.iOS
             var napphsi = App.AppHSI.Count;
             Device.StartTimer(TimeSpan.FromSeconds(0.3), () =>
             {
-                if (App.AppHSI.Count != napphsi) tabControl.reloaddata();
+                if (App.AppHSI.Count != napphsi)
+                {
+                    tabControl.reloaddata();
+                    napphsi = App.AppHSI.Count;
+                }
                 return true; // True = Repeat again, False = Stop the timer
             });
+            /*
+            var application = UIApplication.SharedApplication;
+            var statusBarView = application.ValueForKey(new NSString("statusBar")) as UIView;
+            var foregroundView = statusBarView.ValueForKey(new NSString("foregroundView")) as UIView;
+            
+            UIView dataNetworkItemView = null;
+            foreach (UIView subview in foregroundView.Subviews)
+            {
+                System.Diagnostics.Debug.WriteLine(subview.Class.Name+"\n");
+                if ("UIStatusBarSignalStrengthItemView" == subview.Class.Name)
+                {
+                    dataNetworkItemView = subview;
+                    break;
+                }
+            }
+            if (null == dataNetworkItemView)
+                System.Diagnostics.Debug.WriteLine(" return false; //NO SERVICE");
+            int bars2 = ((NSNumber)dataNetworkItemView.ValueForUndefinedKey(new NSString("signalStrengthBars"))).Int32Value;
+            int bars = ((NSNumber)dataNetworkItemView.ValueForKey(new NSString("signalStrengthBars"))).Int32Value;
+            System.Diagnostics.Debug.WriteLine("datanetwork "+ bars + " "+bars2);*/
 
             tabControl.View.Frame = new CGRect(0, 70, View.Bounds.Width, View.Bounds.Height - 70);
             View.Add(tabControl.View);

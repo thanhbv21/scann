@@ -7,23 +7,14 @@
 using Foundation;
 using System;
 using System.CodeDom.Compiler;
-using UIKit;
 
 namespace Scannn.iOS
 {
-    [Register ("FirstTab")]
-    partial class FirstTab
+    [Register ("QRScan")]
+    partial class QRScan
     {
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UILabel label1 { get; set; }
-
         void ReleaseDesignerOutlets ()
         {
-            if (label1 != null) {
-                label1.Dispose ();
-                label1 = null;
-            }
         }
     }
 }

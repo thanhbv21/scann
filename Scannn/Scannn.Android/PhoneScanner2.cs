@@ -5,7 +5,9 @@ using Scannn;
 using Scannn.Views;
 using System;
 using Xamarin.Forms;
-using ZXing.Mobile;
+using MWBarcodeScanner;
+using Android.Support.V7.App;
+using Android.OS;
 
 [assembly: Dependency(typeof(PhoneScanner2))]
 namespace cdit.ezcheck
@@ -14,9 +16,26 @@ namespace cdit.ezcheck
     {
         Android.Views.View zxingOverlay;
         Android.Widget.Button flashButton;
-        MobileBarcodeScanner scanner = new MobileBarcodeScanner();
+        Scanner scanner;
+        //MWBarcodeScanner scanner = new MWBarcodeScanner();
         public async void Scan()
         {
+            scanner = new Scanner(Forms.Context);
+
+            scanner.setInterfaceOrientation("Portrait");
+            var result = await scanner.Scan();
+
+            if (result != null)
+            {
+                System.Diagnostics.Debug.WriteLine("như shit");
+                new Handler().PostDelayed(() => Device.BeginInvokeOnMainThread(() => {
+                    var dialog = new AlertDialog.Builder(Forms.Context);
+                    dialog.SetTitle(result.type + (result.isGS1 ? " (GS1)" : ""));
+                    dialog.SetMessage(result.code);
+                    dialog.Show();
+                }), 500);
+            }
+            /*
             scanner.UseCustomOverlay = true;
             var options = new MobileBarcodeScanningOptions() {
                  AutoRotate = false
@@ -38,7 +57,7 @@ namespace cdit.ezcheck
 
             var result = await scanner.Scan(options);
             System.Diagnostics.Debug.WriteLine("Đợi két quả");
-            HandleScanResult(result);
+            HandleScanResult(result);*/
         }
 
         public void HandleScanResult(ZXing.Result result)
@@ -91,5 +110,8 @@ namespace cdit.ezcheck
                 msg = "Scanning Canceled!";
             Toast.MakeText(Android.App.Application.Context, msg, ToastLength.Long).Show();
         }
+
+
+        
     }
 }

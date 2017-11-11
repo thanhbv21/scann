@@ -16,6 +16,12 @@ namespace Scannn
 
         public static string RestPurchaseUrl = "https://api.ezcheck.vn/check3_service_app/app/purchasebycode";
 
+        public static string RestLoginUrl = "https://api.ezcheck.vn//check3_service_dashboard/user/signin";
+
+        public static string RestLogoutUrl = "https://api.ezcheck.vn//check3_service_dashboard/user/signout";
+
+        public static string RestGetProfileWithoutSSUrl = "https://api.ezcheck.vn//check3_service_dashboard/user/getprofilewithousession";
+
         public static string ColorPrimary = "#5e2abb";
 
         public static string ColorSecondary = "#d2c1f1";
@@ -23,5 +29,7 @@ namespace Scannn
         public static string WebUrl = "https://api.ezcheck.vn/check/{0}";
 
         public static string WebLHYDUrl = "https://ezcheck.vn/loihayydep/{0}";
+
+        public static string RestLHYDUrl = "https://api.ezcheck.vn/check3_service_admin/loihay/getloihayydep/{0}";
     }
 }

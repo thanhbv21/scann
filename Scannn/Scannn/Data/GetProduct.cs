@@ -123,14 +123,40 @@ namespace Scannn.Data
                     Debug.WriteLine(content);
                     Items = JsonConvert.DeserializeObject<ProductAPI>(content);
                     Debug.WriteLine("Sản phẩm lấy được: " + Items.item.pro_name);
+                    return Items;
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(@"				ERROR {0}", ex.Message);
             }
-           // throw new NotImplementedException();
-            return Items;
+            throw new NotImplementedException();
+            
+        }
+
+        public async Task<LHYDAPI> PerformGetLHYDAPI(string itemcode)
+        {
+            Debug.WriteLine("Activate get LHYD");
+            LHYDAPI Items = new LHYDAPI();
+            Debug.WriteLine("mã hàng:" + itemcode);
+            var uri = new Uri(string.Format(Constants.RestLHYDUrl, itemcode));
+            try
+            {
+                Debug.WriteLine("link:" + uri);
+                var response = await client.GetAsync(uri);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    Debug.WriteLine(content);
+                    Items = JsonConvert.DeserializeObject<LHYDAPI>(content);
+                    return Items;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(@"				ERROR {0}", ex.Message);
+            }
+            throw new NotImplementedException();
         }
     }
 }

@@ -12,6 +12,12 @@ namespace Scannn.iOS
     {
         public bool IsInternet()
         {
+            //bool isOnline = false;
+            //if()
+            NetworkStatus internetStatus = Reachability.InternetConnectionStatus();
+            if (!Reachability.IsHostReachable("http://google.com")) return false;
+            //if (internetStatus.Equals(NetworkStatus.NotReachable)) return false;
+            
             return true;
         }
     }

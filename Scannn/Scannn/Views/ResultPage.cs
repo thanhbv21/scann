@@ -4,7 +4,12 @@ using Scannn.Models;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Forms;
+
 
 namespace Scannn.Views
 {
@@ -12,7 +17,10 @@ namespace Scannn.Views
     {
         public string color_theme = Constants.ColorPrimary;
         private bool disback = true;
-        
+        private Image bgimage;
+        // private Label author;
+        LHYDAPI lhydapi;
+
         public ResultPage(string itemcode)
         {
             App.Bought = true;
@@ -21,15 +29,15 @@ namespace Scannn.Views
             NavigationPage.SetHasNavigationBar(this, false);
             this.Title = "Thông tin sản phẩm";
             Debug.WriteLine("Khởi tạo ban đầu");
+
             CheckLoadingInit(itemcode);
         }
 
         private void CheckLoadingInit(string itemcode)
         {
+            NavigationPage.SetHasNavigationBar(this, false);
             if (DependencyService.Get<ICheckInternet>().IsInternet())
             {
-                
-                NavigationPage.SetHasNavigationBar(this, false);
                 Debug.WriteLine("Mạng Ok");
                 var layout = new StackLayout();
                 var indicator = new ActivityIndicator()
@@ -90,17 +98,77 @@ namespace Scannn.Views
                 HeightRequest = App.Current.MainPage.Height,
                 WidthRequest = App.Current.MainPage.Width,
             };
-            
             if (mode == 2)
             {
-                resultweb.Source = string.Format(Constants.WebLHYDUrl, itemcode);
                 this.Title = "Lời hay ý đẹp";
-            }
-            else 
-                resultweb.Source = string.Format(Constants.WebUrl, itemcode);
+                lhydapi = new LHYDAPI();
+                bgimage = new Image()
+                {
+                    WidthRequest = App.Current.MainPage.Width,
+                    HeightRequest = App.Current.MainPage.Width + App.Current.MainPage.Width / 5 - 20,
+                    Aspect = Aspect.AspectFit,
+                    Margin = new Thickness(10, 10, 10, 0),
+                    BackgroundColor = Color.FromHex("#f2f2f2")
+                };
+                /*author = new Label()
+                {
+                    WidthRequest = WidthRequest = App.Current.MainPage.Width,
+                    //HeightRequest = 100,
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center,
 
-            //stackweb.Children.Add(probar);
-            stackweb.Children.Add(resultweb);
+                    Margin = new Thickness(10, 10, 10, 0),
+                    //BackgroundColor = Color.FromHex("#f2f2f2")
+                };*/
+                BoxView endBoxView = new BoxView
+                {
+                    Color = Color.FromHex(Constants.ColorPrimary),
+                    HeightRequest = Application.Current.MainPage.Height - Application.Current.MainPage.Width - 50,
+                    WidthRequest = Application.Current.MainPage.Width,
+                    Margin = new Thickness(0, 20, 0, 0),
+                    //VerticalOptions = LayoutOptions.Center
+                };
+                ToolbarItems.Add(new ToolbarItem("Refresh", "ic_refresh", () =>
+                {
+                    LHYDF5(itemcode);
+                }));
+                try
+                {
+                    LHYDF5(itemcode);
+
+                    ToolbarItems.Add(new ToolbarItem("Share", "ic_share", () =>
+                    {
+                        DependencyService.Get<IShare>().ShareAsync(bgimage.Source, "test");
+                    })
+                );
+                    stackweb.Children.Add(bgimage);
+                    //stackweb.Children.Add(author);
+                    stackweb.Children.Add(endBoxView);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.GetType().ToString() == "System.NotImplementedException")
+                    {
+                        CheckLoadingInit(itemcode);
+                    }
+                    Content = SetErrorPage();
+                }
+                //resultweb.Source = string.Format(Constants.WebLHYDUrl, itemcode);
+                /*try {
+                    var client = new HttpClient();
+                    var shtml = await client.GetStringAsync("https://ezcheck.vn/loihayydep/B227690745826");
+                    Debug.WriteLine(shtml);
+                }
+                catch(Exception e)
+                {
+                    Debug.WriteLine(e);
+                }*/
+            }
+            else
+            {
+                resultweb.Source = string.Format(Constants.WebUrl, itemcode);
+                stackweb.Children.Add(resultweb);
+            }
             Content = stackweb;
         }
 
@@ -118,7 +186,7 @@ namespace Scannn.Views
                 Source = "no_internet_connection"
             };
 
-            
+
             var status = new Label()
             {
                 Text = "Xin lỗi, hiện không có kết nối Internet",
@@ -137,6 +205,7 @@ namespace Scannn.Views
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
                 BackgroundColor = Color.FromHex(color_theme),
                 Text = "Thử lại",
+                WidthRequest = Application.Current.MainPage.Width / 6,
                 TextColor = Color.White
             };
             nonetstack.Children.Add(verifyimage);
@@ -166,7 +235,7 @@ namespace Scannn.Views
             var layout = new StackLayout();
             var paddingTLR = new Thickness(10, 10, 10, 10);
             var paddingTB = new Thickness(0, 10, 0, 10);
-            
+
             //Trích xuất dữ liệu
             LayoutDataResult dataresult = new LayoutDataResult();
             ProductAPI proapi = new ProductAPI();
@@ -224,7 +293,7 @@ namespace Scannn.Views
                 layout.Spacing = 10;
                 scroll.Content = layout;
 
-                
+
                 if (proapi.code == 444 || proapi.code == 400 || proapi.code == 445)
                 {
                     verifyimage.Source = "icon_result_2";
@@ -258,7 +327,7 @@ namespace Scannn.Views
                         thanksLabelText = "Ngày bán: " + pro.ite_soldtime;
                         App.Bought = false;
                     }
-                   
+
                     else
                     if (dataresult.product.ite_status != "3" && proapi.changed == 1)
                     {
@@ -297,7 +366,7 @@ namespace Scannn.Views
                         {
                             proimage.Source = "icon_default";
                         }
-                        
+
                     }
                     else
                     {
@@ -341,13 +410,51 @@ namespace Scannn.Views
                     productdetailStack.Children.Add(muaspButton);
 
                     var grid = new Grid();
-                    grid.RowDefinitions.Add(new RowDefinition { Height = Application.Current.MainPage.Width/3 });
+                    grid.RowDefinitions.Add(new RowDefinition { Height = Application.Current.MainPage.Width / 3 });
                     grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
                     grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(3, GridUnitType.Star) });
                     grid.Children.Add(proimage, 0, 0);
                     grid.Children.Add(productdetailStack, 1, 0);
                     var stack2 = new StackLayout();
                     stack2.Children.Add(grid);
+                    stack2.Padding = paddingTB;
+                    stack2.BackgroundColor = Color.White;
+                    layout.Children.Add(stack2);
+
+                    var stackprivate = new StackLayout();
+                    if(App.sessionId!=null)
+                    {
+                        
+                        var privatetitle = new Label
+                        {
+                            Text = "THÔNG TIN NỘI BỘ",
+                            FontSize = Device.GetNamedSize(NamedSize.Medium, typeof(Label)),
+                            FontAttributes = FontAttributes.Bold,
+                            TextColor = Color.Black
+                        };
+                        var privategapBoxView = new BoxView
+                        {
+                            Color = Color.Gray,
+                            HeightRequest = 1,
+                            WidthRequest = (Application.Current.MainPage.Width / 7) * 6,
+                            VerticalOptions = LayoutOptions.Center
+                        };
+                        var private_z = new Label()
+                        {
+                            Text = dataresult.product.private_z,
+                            FontSize = Device.GetNamedSize(NamedSize.Small, typeof(Label)),
+                            //FontAttributes = FontAttributes.Bold,
+                            TextColor = Color.Black
+                        };
+                        stackprivate.Children.Add(privatetitle);
+                        stackprivate.Children.Add(privategapBoxView);
+                        stackprivate.Children.Add(private_z);
+
+                        stackprivate.Padding = paddingTLR;
+                        stackprivate.BackgroundColor = Color.White;
+                        layout.Children.Add(stackprivate);
+
+                    }
 
                     //Thông tin chi tiết sản phẩm 
                     var stack3 = new StackLayout();
@@ -373,12 +480,19 @@ namespace Scannn.Views
                     var gapBoxView1 = new BoxView
                     {
                         Color = Color.Gray,
-                        HeightRequest = 3,
+                        HeightRequest = 1,
                         WidthRequest = (Application.Current.MainPage.Width / 7) * 6,
                         VerticalOptions = LayoutOptions.Center
                     };
+
+                    
                     stack3.Children.Add(gapBoxView1);
+                    
                     stack3.Children.Add(productdetailWebView);
+
+                    stack3.Padding = paddingTLR;
+                    stack3.BackgroundColor = Color.White;
+                    layout.Children.Add(stack3);
 
                     //Mô tả công ty
                     var stack4 = new StackLayout();
@@ -394,7 +508,7 @@ namespace Scannn.Views
                     var gapBoxView = new BoxView
                     {
                         Color = Color.Gray,
-                        HeightRequest = 3,
+                        HeightRequest = 1,
                         WidthRequest = (Application.Current.MainPage.Width / 7) * 6,
                         VerticalOptions = LayoutOptions.Center
                     };
@@ -440,17 +554,13 @@ namespace Scannn.Views
                         BackgroundColor = Color.FromHex(color_theme),
                         HeightRequest = 50
                     };
-                    stack2.Padding = paddingTB;
-                    stack3.Padding = paddingTLR;
+                    
+                    
+
                     stack4.Padding = paddingTLR;
-
-                    stack2.BackgroundColor = Color.White;
-                    stack3.BackgroundColor = Color.White;
                     stack4.BackgroundColor = Color.White;
-
-                    layout.Children.Add(stack2);
-                    layout.Children.Add(stack3);
                     layout.Children.Add(stack4);
+
                     layout.Children.Add(endBoxView);
 
                     //Lưu dự liệu scan vào lịch sử
@@ -493,7 +603,7 @@ namespace Scannn.Views
                             }
                         }
                     );
-                    Device.StartTimer(TimeSpan.FromSeconds(0.5), () =>
+                    Device.StartTimer(TimeSpan.FromSeconds(0.1), () =>
                     {
                         // Do something
                         //Debug.WriteLine("Chỉ số đã mua: " + App.Bought);
@@ -554,12 +664,54 @@ namespace Scannn.Views
             return nonetstack;
         }
 
+        private async void LHYDF5(string itemcode)
+        {
+            lhydapi = await App.SvManager.GetLHYDAsync(itemcode);
+            LHYD lhyd = lhydapi.data;
+            //author.Text = "-" + lhyd.author + "-";
+            try
+            {
+                if (lhyd.img != "")
+                {
+                    try
+                    {
+                        Debug.WriteLine("img");
+                        byte[] proimageBytes = Convert.FromBase64String(lhyd.img);
+                        var inputbg = ImageSource.FromStream(
+                                   () => new MemoryStream(proimageBytes));
+                        bgimage.Source = await DependencyService.Get<IDraw>().Drawtext(inputbg, lhyd.content, "- " + lhyd.author + " - ");
+
+                        Debug.WriteLine("chạy oke");
+                    }
+                    catch
+                    {
+
+                        Debug.WriteLine("lỗi draw text");
+                        var inputbg = "bg_default";
+
+                        bgimage.Source = await DependencyService.Get<IDraw>().Drawtext(inputbg, lhyd.content, "- " + lhyd.author + " - ");
+                    }
+                }
+                else
+                {
+                    var inputbg = "bg_default";
+                    Debug.WriteLine("ko có ảnh từ api");
+                    bgimage.Source = await DependencyService.Get<IDraw>().Drawtext(inputbg, lhyd.content, "- " + lhyd.author + " - ");
+
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Lỗi từ ban đầu:                 " + e);
+                bgimage.Source = ImageSource.FromFile("bg_default");
+            }
+        }
         protected override bool OnBackButtonPressed()
         {
             if (disback)
                 return true;
             return base.OnBackButtonPressed(); ;
         }
-        
+
     }
 }

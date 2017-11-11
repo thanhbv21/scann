@@ -28,7 +28,7 @@ namespace Scannn.iOS.TabView
             System.Diagnostics.Debug.WriteLine("view appear: "+App.AppNews.Count());
             // Initialize table
             TableView.DataSource = news.DataSource;
-            TableView.Delegate = news.Delegate;
+            //TableView.Delegate = news.Delegate;
             TableView.RowHeight = UITableView.AutomaticDimension;
             TableView.EstimatedRowHeight = 300;
             TableView.ReloadData();

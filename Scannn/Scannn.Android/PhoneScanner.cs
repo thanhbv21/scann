@@ -19,7 +19,8 @@ namespace cdit.ezcheck
         {
             scanner.UseCustomOverlay = true;
             var options = new MobileBarcodeScanningOptions() {
-                 AutoRotate = false
+                 AutoRotate = false,
+                 TryInverted = true
             };
             zxingOverlay = LayoutInflater.FromContext(Android.App.Application.Context).Inflate(Resource.Layout.ScanCustom, null);
             //zxingOverlay.scree

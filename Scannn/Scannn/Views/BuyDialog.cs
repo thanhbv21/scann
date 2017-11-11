@@ -6,7 +6,7 @@ using Xamarin.Forms;
 
 namespace Scannn.Views
 {
-    class BuyDialog : PopupPage
+    public class BuyDialog : PopupPage
     {
         private string itemcode;
 

@@ -12,6 +12,8 @@ namespace Scannn
         Task<ImageAPI> PerformGetImageAsync(string itemcode);
 
         Task PerformPurchaseProductAsync(string itemcode, bool isPurchase);
+
+        Task<LHYDAPI> PerformGetLHYDAPI(string itemcode);
         //Task SaveTodoItemAsync(TodoItem item, bool isNewItem);
 
         //Task DeleteTodoItemAsync(string id);

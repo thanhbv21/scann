@@ -12,9 +12,10 @@ namespace Scannn.iOS
 {
     class TabController : UITabBarController
     {
+        UIActivityIndicatorView activitySpinner;
         UIViewController tab1, tab2, tab3;
         UITableView history,news;
-        FirstTab vtab1;
+        //FirstTab vtab1;
         ThirdTab vtab3;
         UIRefreshControl refreshcontrol;
         List<HistoryScanItem> historyItems;
@@ -27,36 +28,41 @@ namespace Scannn.iOS
             var height = View.Bounds.Height;
             UISwipeGestureRecognizer swipeGesture = new UISwipeGestureRecognizer(SwipeThat);
 
+            System.Diagnostics.Debug.WriteLine("Active Tab");
+
             tab1 = new UIViewController();
+           
             tab1.TabBarItem.Image = UIImage.FromFile("ic_home.png");
             tab1.TabBarItem.ImageInsets = new UIEdgeInsets(7, 0, -7, 0);
-            //vtab1 = FirstTab.Create();
-            //vtab1.Frame = View.Frame;
-            //newsController = new UITableViewController();
-            news = new UITableView(new CGRect(0, 0, View.Bounds.Width, View.Bounds.Height - 110));
+            activitySpinner = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
+            activitySpinner.Frame = new CGRect(0, 0, View.Bounds.Width, View.Bounds.Height - 120);
+            news = new UITableView(new CGRect(0, 0, View.Bounds.Width, View.Bounds.Height - 120));
             news.BackgroundColor = Xamarin.Forms.Color.FromHex("#cfd0d5").ToUIColor();
-            news.RowHeight = 250;
+            news.RowHeight = 285; //2 * View.Bounds.Height / 5 + 110;
+            //news.RowHeight = UITableView.AutomaticDimension;
+            //news.EstimatedRowHeight = 285;
+            news.ReloadData();
             news.AllowsSelection = false;
             news.TableFooterView = new UIView();
-            FirstTabData();
             refreshcontrol = new UIRefreshControl();
+            
             news.Add(refreshcontrol);
+            //newsController = new ItemsController();
+            //newsController.View.Frame = View.Frame;
+            FirstTabData();
             news.Source = new NewsTableSource(App.AppNews);
             news.SeparatorStyle = UITableViewCellSeparatorStyle.None;
-            //news.SeparatorInset = new UIEdgeInsets(0, 200, 0, 0);
-            //news.NumberOfRowsInSection(2);
-            //news.SectionHeaderHeight = 10;
             refreshcontrol.ValueChanged += async (sender, e)
                 =>
             {
                 await refreshnewsdata();
+                news.ReloadData();
                 refreshcontrol.EndRefreshing();
             };
-
+            
+            
             tab1.View.Add(news);
-            //tab1.View.BackgroundColor = UIColor.Green;
-            //tab1.View.UserInteractionEnabled = true;
-            //tab1.View.AddGestureRecognizer(swipeGesture);
+            tab1.View.Add(activitySpinner);
 
             tab2 = new UIViewController();
             history = new UITableView(new CGRect(0,0,View.Bounds.Width, View.Bounds.Height - 110));
@@ -68,10 +74,8 @@ namespace Scannn.iOS
 
             tab2.TabBarItem.Image = UIImage.FromFile("ic_history.png");
             tab2.TabBarItem.ImageInsets = new UIEdgeInsets(7, 0, -7, 0);
-            //tab2.View.BackgroundColor = UIColor.Orange;
             tab2.View.UserInteractionEnabled = true;
             tab2.View.AddGestureRecognizer(swipeGesture);
-            //history.AutoresizingMask = UIViewAutoresizing.FlexibleWidth;
             tab2.View.Add(history);
 
             tab3 = new UIViewController();
@@ -81,6 +85,7 @@ namespace Scannn.iOS
             tab3.View.AddGestureRecognizer(swipeGesture);
             vtab3 = new ThirdTab(View.Bounds.Width, View.Bounds.Height)
             {
+                BackgroundColor = Xamarin.Forms.Color.FromHex("#cfd0d5").ToUIColor(),
                 Frame = new CoreGraphics.CGRect(0, 0, View.Bounds.Width, View.Bounds.Height - 20)
             };
             tab3.View.Add(vtab3);
@@ -96,8 +101,11 @@ namespace Scannn.iOS
         {
             List<NewsItem> nItems = new List<NewsItem>();
             App.AppNews = App.NDatabase.GetItemsAsync().Result;
-            if(App.AppNews.Count == 0)
+            System.Diagnostics.Debug.WriteLine("Load firstdata");
+            if (App.AppNews.Count == 0)
             {
+
+                System.Diagnostics.Debug.WriteLine("Không có dữ liệu");
                 await refreshnewsdata();
             }
         }
@@ -108,6 +116,7 @@ namespace Scannn.iOS
             //await App.NDatabase.DeleteAllAsync();
             //App.AppNews.Clear();
             //List<NewsItem> defaultnews = new List<NewsItem>();
+
             NewsItem DefaultNew1 = new NewsItem()
             {
                 title = "VÌ SAO EZCHECK LẠI CẦN THIẾT CHO NGƯỜI TIÊU DÙNG?",
@@ -131,7 +140,7 @@ namespace Scannn.iOS
             NewsItem DefaultNew3 = new NewsItem()
             {
                 title = "ƯU THẾ NỔI TRỘI CỦA GIẢI PHÁP",
-                content = "Chống giả hiệu quả nhất<br>Đầu tư tối thiểu cho hiệu quả tối đa<br>Thông minh - Tiện dụng<br>Dễ dàng tương thích",
+                content = "Chống giả hiệu quả nhất! Đầu tư tối thiểu cho hiệu quả tối đa! Thông minh - Tiện dụng! Dễ dàng tương thích\n",
                 detail = "http://ezcheck.vn/News/Details/44",
                 img = "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",
                 time = "09/02/2017"
@@ -143,29 +152,45 @@ namespace Scannn.iOS
 
         private async Task refreshnewsdata()
         {
-            App.AppNews.Clear();
-            news.ReloadData();
+            if (App.AppNews.Count > 0)
+            {
+                System.Diagnostics.Debug.WriteLine("Đã có dữ liệu trk đó");
+                App.AppNews.Clear();
+                news.ReloadData();
+            }
+            else
+            {
+                activitySpinner.StartAnimating();
+                System.Diagnostics.Debug.WriteLine("Bắt dầu f5");
+            }
             NewItemsAPI newsapi = new NewItemsAPI();
             try
             {
                 newsapi = await App.SvNewsManager.GetNewsAsync();
+
                 await App.NDatabase.DeleteAllAsync();
                 for (int i = 0; i < newsapi.data.Count; i++)
                 {
                     App.AppNews.Add(newsapi.data[i]);
                     await App.NDatabase.SaveItemsAsync(newsapi.data[i]);
                 }
+                activitySpinner.StopAnimating();
                 news.ReloadData();
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine("Tiến trình lấy tin tức:" + ex.Message);
                 App.AppNews = await App.NDatabase.GetItemsAsync();
-                if(App.AppNews.Count == 0)
+                System.Diagnostics.Debug.WriteLine(App.AppNews.Count);
+                if (App.AppNews.Count == 0)
                 {
                     await createdefault();
                     App.AppNews = await App.NDatabase.GetItemsAsync();
+                    
+                    //refreshcontrol.EndRefreshing();
                 }
+                news.Source = new NewsTableSource(App.AppNews);
+                activitySpinner.StopAnimating();
                 news.ReloadData();
             }
         }

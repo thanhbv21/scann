@@ -7,6 +7,7 @@ using Foundation;
 using Scannn.Models;
 using UIKit;
 using Xamarin.Forms.Platform.iOS;
+using ObjCRuntime;
 
 namespace Scannn.iOS.TabView
 {
@@ -26,19 +27,27 @@ namespace Scannn.iOS.TabView
             NewsItem item = TableItems[indexPath.Row];
 
             if (cell == null) cell = new NewsItemCell(CellIdentifier);
+            //if(cell == null)
+            //{
+                //cell = new Items();
+            //     //= UINib.FromName("NewsItemViewCell", NSBundle.MainBundle);
+            //    //cell = Runtime.GetNSObject(views.ValueAt(0)) as NewsCell;
+            //}
 
+            //cell.BindDataToCell(indexPath.Row);
             byte[] imageByte = Convert.FromBase64String(item.img);
             NSData data = NSData.FromArray(imageByte);
             UIImage itemimage = UIImage.LoadFromData(data);
-
+            
             cell.BackgroundColor = Xamarin.Forms.Color.FromHex("#cfd0d5").ToUIColor();
             //cell.Layer.BorderWidth = 5;
             //cell.Layer.BorderColor = UIColor.Gray.CGColor;// = new UIEdgeInsets(10,0,0,0);
             //cell.LayoutMargins = new UIEdgeInsets(10, 0, 0, 0);
             //cell.Layer.BackgroundColor = UIColor.Gray.CGColor;
-
+            cell.ContentView.SetNeedsLayout();
+            cell.ContentView.LayoutIfNeeded();
             cell.UpdateCell(item);
-
+            //cell.UpdateCell(item);
             return cell;
         }
 
