@@ -1,4 +1,4 @@
-# scann
+# ezCheck VN Application 
 
 ezCheck.vn
 Giải pháp xác thực nguồn gốc sản phẩm
